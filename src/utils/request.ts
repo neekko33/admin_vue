@@ -30,8 +30,8 @@ import axios from 'axios';
 
 /* 创建axios实例 */
 const service = axios.create({
-  // baseURL: 'http://212.64.78.155:7001/api/v4',
-  baseURL: 'http://127.0.0.1:7001/api/v5',
+  baseURL: 'http://212.64.78.155:7001/api/v5',
+  // baseURL: 'http://127.0.0.1:7001/api/v5',
   timeout: 5000, // 请求超时时间
 });
 
