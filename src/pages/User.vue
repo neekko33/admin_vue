@@ -36,7 +36,11 @@
           align="center"
         ></el-table-column>
         <el-table-column label="操作" align="center">
-          <el-button type="danger" disabled>删除</el-button>
+          <template slot-scope="{ row }">
+            <el-button type="danger" @click="deleteUser(row.id)"
+              >删除</el-button
+            >
+          </template>
         </el-table-column>
       </el-table>
       <!--      <el-pagination background layout="prev, pager, next" :total="1000">-->
@@ -47,7 +51,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { getUserList } from "../api/user";
+import { getUserList, deleteUser } from "../api/user";
 import { UserData } from "../interface";
 
 @Component
@@ -63,6 +67,26 @@ export default class Type extends Vue {
       } = await getUserList();
       this.userList = data;
     } catch (e) {
+      console.log(e);
+    }
+  }
+  public async deleteUser(id: string) {
+    try {
+      const {
+        data: { code }
+      } = await deleteUser(id);
+      if (code === 0) {
+        this.$notify.success({
+          title: "成功",
+          message: "删除成功"
+        });
+        this.getUser();
+      }
+    } catch (e) {
+      this.$notify.error({
+        title: "失败",
+        message: "删除失败"
+      });
       console.log(e);
     }
   }

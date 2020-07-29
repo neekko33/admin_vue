@@ -23,18 +23,16 @@
           align="center"
           width="60"
         ></el-table-column>
-        <el-table-column
-          prop="username"
-          label="作者"
-          align="center"
-          width="120"
-        ></el-table-column>
-        <el-table-column
-          prop="typeName"
-          label="类型"
-          align="center"
-          width="120"
-        ></el-table-column>
+        <el-table-column label="作者" align="center" width="120">
+          <template slot-scope="{ row }">
+            {{ row.user.username }}
+          </template>
+        </el-table-column>
+        <el-table-column label="类型" align="center" width="120">
+          <template slot-scope="{ row }">
+            {{ row.type.typeName }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="title"
           label="标题"
@@ -95,10 +93,12 @@ export default class ArticleList extends Vue {
   public async getArticle(pageNum: number, pageSize: number) {
     try {
       const {
-        data: { data, total }
+        data: {
+          data: { articles, count }
+        }
       } = await getArticleList(pageNum, pageSize);
-      this.articleList = data;
-      this.total = total;
+      this.articleList = articles;
+      this.total = count;
     } catch (e) {
       console.log(e);
     }

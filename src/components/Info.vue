@@ -127,7 +127,6 @@ export default class Info extends Vue {
     this.area = map[1].trim();
   }
   public async Submit() {
-    console.log("submit");
     for (const key in this.form) {
       if (typeof this.form[key] == "number") {
         continue;
@@ -140,7 +139,6 @@ export default class Info extends Vue {
         return;
       }
     }
-    console.log("updateAddress");
     this.form.address = `${this.city} / ${this.area}`;
     await updateUser(this.form.id as number, this.form);
     this.$notify.success({

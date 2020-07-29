@@ -114,8 +114,8 @@ export default class EditArticle extends Vue {
       const {
         data: { data }
       } = await getArticleById(Number(id));
-      this.form = data[0];
-      this.form.addTime = data[0].addTime;
+      this.form = data;
+      this.form.addTime = Number(data.addTime);
     } catch (e) {
       console.log(e);
     }
