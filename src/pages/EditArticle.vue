@@ -131,7 +131,7 @@ export default class EditArticle extends Vue {
         title: "成功",
         message: "图片上传成功"
       });
-      const url = "http://212.64.78.155/images/" + data.filename;
+      const url = data.path;
       const ref: any = this.$refs.md;
       ref.$img2Url(filename, url);
     } else {
