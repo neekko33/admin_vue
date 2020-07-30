@@ -32,7 +32,7 @@
           placeholder="请输入用户名，注：该用户名用于后台系统的登陆"
         ></el-input>
       </el-form-item>
-      <el-form-item label="密码：">
+      <el-form-item label="密码：" v-if="isCreate">
         <el-input
           v-model="password"
           type="password"
@@ -41,7 +41,7 @@
           placeholder="请输入密码"
         ></el-input>
       </el-form-item>
-      <el-form-item label="确认密码：">
+      <el-form-item label="确认密码：" v-if="isCreate">
         <el-input
           v-model="confirmPassword"
           type="password"
