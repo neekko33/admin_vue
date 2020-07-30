@@ -47,3 +47,7 @@ export interface Passwords {
   oldPassword: string;
   newPassword: string;
 }
+
+export interface UploadFile {
+  raw: File
+}

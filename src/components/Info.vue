@@ -96,7 +96,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { UserData } from "@/interface";
+import { UserData, UploadFile } from "@/interface";
 import { getUserById, updateUser, createUser } from "@/api/user";
 import { uploadImage } from "@/api/article";
 @Component
@@ -104,7 +104,7 @@ export default class Info extends Vue {
   private isCreate = false;
   private password = "";
   private confirmPassword = "";
-  private file: File;
+  private file: File = new File([], "basedFile");
   private form: UserData = {
     id: JSON.parse(window.localStorage.getItem("USER_INFO") as string).id,
     username: "User",
@@ -187,8 +187,8 @@ export default class Info extends Vue {
     }
     return true;
   }
-  public handleUpload({ raw }) {
-    this.file = raw as File;
+  public handleUpload(file: UploadFile) {
+    this.file = file.raw;
   }
   public async Save() {
     delete this.form.id;
