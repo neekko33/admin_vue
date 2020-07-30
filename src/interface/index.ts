@@ -40,6 +40,7 @@ export interface UserData {
   tags: string;
   address: string;
   introduce: string;
+  password?: string;
 }
 
 export interface Passwords {

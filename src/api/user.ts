@@ -51,3 +51,12 @@ export function deleteUser(id: string) {
     method: 'delete',
   });
 }
+
+// 新增用户
+export function createUser(params:UserData) {
+  return request({
+    url: '/user',
+    method: 'post',
+    data: params
+  });
+}

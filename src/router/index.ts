@@ -68,7 +68,22 @@ const routes: Array<RouteConfig> = [
         path: 'user',
         name: 'user',
         meta: { title: '用户管理' },
+        redirect: '/user/list',
         component: () => import(/* webpackChunkName:"user" */ '../pages/User.vue'),
+        children:[
+          {
+            path: 'list',
+            name: 'list',
+            meta: {title: '新增用户'},
+            component: ()=> import(/* webpackChunkName:"user" */ '../components/UserList.vue')
+          },
+          {
+            path: 'create',
+            name: 'create',
+            meta: {title: '新增用户'},
+            component: ()=> import(/* webpackChunkName:"user" */ '../components/Info.vue')
+          }
+        ]
       },
       {
         path: 'setting',

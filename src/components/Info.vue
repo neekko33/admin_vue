@@ -1,70 +1,113 @@
 /* eslint-disable no-undef */
 <template>
-  <el-form
-    :model="form"
-    label-width="100px"
-    label-position="right"
-    style="width: 50%;"
-  >
-    <el-form-item label="用户名：">
-      <el-input
-        v-model="form.username"
-        disabled
-        placeholder="请输入用户名，注：该用户名用于后台系统的登陆"
-      ></el-input>
-    </el-form-item>
-    <el-form-item label="昵称：">
-      <el-input
-        v-model="form.nickname"
-        clearable
-        placeholder="请输入在作者页面显示的昵称，显示格式例：@neekko33"
-      ></el-input>
-    </el-form-item>
-    <el-form-item label="标签：">
-      <el-input
-        v-model="form.tags"
-        placeholder="请输入个性标签，以英文逗号分隔，例：艾泽拉斯探险家,Steam游戏蝗虫"
-      ></el-input>
-    </el-form-item>
-    <el-form-item label="地址：">
-      <el-select label="地址：" v-model="city" style="width:calc(50% - 10px)">
-        <el-option
-          v-for="item in province"
-          :key="item"
-          :label="item"
-          :value="item"
-          >{{ item }}</el-option
+  <div class="main">
+    <div class="upload" v-if="isCreate">
+      <el-upload
+        ref="file"
+        class="upload-demo"
+        :auto-upload="false"
+        drag
+        action="https://jsonplaceholder.typicode.com/posts/"
+        :on-change="handleUpload"
+        :multiple="false"
+        :limit="1"
+        :show-file-list="true"
+      >
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将头像拖到此处，或<em>点击上传</em></div>
+      </el-upload>
+    </div>
+    <el-form
+      :model="form"
+      label-width="100px"
+      label-position="right"
+      style="width: 50%;"
+    >
+      <el-form-item label="用户名：">
+        <el-input
+          v-model="form.username"
+          :disabled="!isCreate"
+          :clearable="isCreate"
+          autocomplete="off"
+          placeholder="请输入用户名，注：该用户名用于后台系统的登陆"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="密码：">
+        <el-input
+          v-model="password"
+          type="password"
+          clearable
+          autocomplete="off"
+          placeholder="请输入密码"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="确认密码：">
+        <el-input
+          v-model="confirmPassword"
+          type="password"
+          clearable
+          autocomplete="off"
+          placeholder="请再次输入密码"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="昵称：">
+        <el-input
+          v-model="form.nickname"
+          clearable
+          placeholder="请输入在作者页面显示的昵称，显示格式例：@neekko33"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="标签：">
+        <el-input v-model="form.tags" placeholder="请输入个性标签"></el-input>
+      </el-form-item>
+      <el-form-item label="地址：">
+        <el-select label="地址：" v-model="city" style="width:calc(50% - 10px)">
+          <el-option
+            v-for="item in province"
+            :key="item"
+            :label="item"
+            :value="item"
+            >{{ item }}</el-option
+          >
+        </el-select>
+        <el-input
+          v-model="area"
+          placeholder="请输入地区"
+          style="width:50%;margin-left:10px;"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="个性签名：">
+        <el-input
+          v-model="form.introduce"
+          type="textarea"
+          :rows="6"
+          placeholder="请输入个性签名"
+        ></el-input>
+      </el-form-item>
+      <el-form-item style="text-align: left;">
+        <el-button type="primary" @click="Save" v-if="isCreate"
+          >保存用户</el-button
         >
-      </el-select>
-      <el-input
-        v-model="area"
-        placeholder="请输入地区"
-        style="width:50%;margin-left:10px;"
-      ></el-input>
-    </el-form-item>
-    <el-form-item label="个性签名：">
-      <el-input
-        v-model="form.introduce"
-        type="textarea"
-        :rows="6"
-        placeholder="请输入个性签名"
-      ></el-input>
-    </el-form-item>
-    <el-form-item style="text-align: left;">
-      <el-button type="primary" @click="Submit">保存更改</el-button>
-    </el-form-item>
-  </el-form>
+        <el-button type="primary" @click="Submit" v-else>保存更改</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { UserData } from "@/interface";
-import { getUserById, updateUser } from "@/api/user";
+import { getUserById, updateUser, createUser } from "@/api/user";
+import { uploadImage } from "@/api/article";
 @Component
 export default class Info extends Vue {
+  private isCreate = false;
+  private password = "";
+  private confirmPassword = "";
+  private file: File;
   private form: UserData = {
     id: JSON.parse(window.localStorage.getItem("USER_INFO") as string).id,
-    username: "",
+    username: "User",
     nickname: "",
     tags: "",
     address: "",
@@ -109,6 +152,8 @@ export default class Info extends Vue {
     "澳门特别行政区"
   ];
   public created() {
+    this.isCreate = this.$route.name === "create";
+    if (this.isCreate) return;
     this.GetUser();
   }
   public async GetUser() {
@@ -126,19 +171,61 @@ export default class Info extends Vue {
     this.city = map[0].trim();
     this.area = map[1].trim();
   }
-  public async Submit() {
+  public Validate() {
     for (const key in this.form) {
       if (typeof this.form[key] == "number") {
         continue;
       }
       if (this.form[key].trim() == "") {
+        console.log(key);
         this.$notify.error({
           title: "错误",
-          message: "输入不能为空"
+          message: "内容不能为空"
         });
-        return;
+        return false;
       }
     }
+    return true;
+  }
+  public handleUpload({ raw }) {
+    this.file = raw as File;
+  }
+  public async Save() {
+    delete this.form.id;
+    this.form.address = `${this.city} / ${this.area}`;
+    if (!this.Validate()) return;
+    if (this.password !== this.confirmPassword) {
+      this.$notify.error({
+        title: "错误",
+        message: "两次密码不相同，请重新输入"
+      });
+      return;
+    }
+    this.form.password = this.password;
+    const formData = new FormData();
+    formData.append("file", this.file);
+    const {
+      data: { data }
+    } = await uploadImage(formData);
+    this.form.avatar = data.path;
+    const {
+      data: { code }
+    } = await createUser(this.form);
+    if (code === 0) {
+      this.$notify.success({
+        title: "成功",
+        message: "保存成功"
+      });
+      this.$router.push({ path: "/user/list" });
+    } else {
+      this.$notify.error({
+        title: "错误",
+        message: "保存失败"
+      });
+    }
+  }
+  public async Submit() {
+    if (!this.Validate()) return;
     this.form.address = `${this.city} / ${this.area}`;
     await updateUser(this.form.id as number, this.form);
     this.$notify.success({
@@ -150,4 +237,14 @@ export default class Info extends Vue {
 }
 </script>
 
-<style></style>
+<style>
+.main {
+  position: relative;
+}
+
+.main .upload {
+  position: absolute;
+  top: 0;
+  left: calc(50% + 50px);
+}
+</style>
